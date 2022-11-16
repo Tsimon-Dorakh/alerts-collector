@@ -1,0 +1,65 @@
+@host = 172.23.250.159:8443
+
+###
+
+GET https://{{host}}/healthz HTTP/1.1
+
+###
+
+POST https://{{host}}/webhook HTTP/1.1
+content-type: application/json
+
+{
+   "receiver":"alerts-collector",
+   "status":"firing",
+   "alerts":[
+      {
+         "status":"firing",
+         "labels":{
+            "alertname":"Watchdog",
+            "namespace":"openshift-monitoring",
+            "openshift_io_alert_source":"platform",
+            "prometheus":"openshift-monitoring/k8s",
+            "severity":"none"
+         },
+         "annotations":{
+            "description":"This is an alert meant to ensure that the entire alerting pipeline is functional.\nThis alert is always firing, therefore it should always be firing in Alertmanager\nand always fire against a receiver. There are integrations with various notification\nmechanisms that send a notification when this alert is not firing. For example the\n\"DeadMansSnitch\" integration in PagerDuty.\n",
+            "summary":"An alert that should always be firing to certify that Alertmanager is working properly."
+         },
+         "startsAt":"2022-11-05T13:54:26.236Z",
+         "endsAt":"0001-01-01T00:00:00Z",
+         "fingerprint":"6934731368443c07"
+      },
+      {
+         "status":"resolved",
+         "labels":{
+            "alertname":"AlertmanagerClusterFailedToSendAlerts",
+            "integration":"webhook",
+            "namespace":"openshift-monitoring",
+            "openshift_io_alert_source":"platform",
+            "prometheus":"openshift-monitoring/k8s",
+            "service":"alertmanager-main",
+            "severity":"warning"
+         },
+         "annotations":{
+            "description":"The minimum notification failure rate to webhook sent from any instance in the  cluster is 100%.",
+            "runbook_url":"https://github.com/openshift/runbooks/blob/master/alerts/cluster-monitoring-operator/AlertmanagerClusterFailedToSendAlerts.md",
+            "summary":"All Alertmanager instances in a cluster failed to send notifications to a critical integration."
+         },
+         "startsAt":"2022-11-17T07:35:20.133Z",
+         "endsAt":"2022-11-17T07:40:20.133Z",
+         "fingerprint":"3b4f8e53678a8f55"
+      }
+   ],
+   "groupLabels":{
+      "namespace":"openshift-monitoring"
+   },
+   "commonLabels":{
+      "namespace":"openshift-monitoring",
+      "openshift_io_alert_source":"platform",
+      "prometheus":"openshift-monitoring/k8s"
+   },
+   "commonAnnotations":{
+      
+   }
+}

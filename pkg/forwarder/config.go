@@ -21,6 +21,7 @@ const (
 )
 
 type AlertingConfig struct {
+	Labels        map[string]string    `yaml:"labels"`
 	Alertmanagers []AlertmanagerConfig `yaml:"alertmanagers"`
 }
 

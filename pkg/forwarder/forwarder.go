@@ -98,6 +98,7 @@ type Forwarder struct {
 	logger        log.Logger
 	alertmanagers []*Alertmanager
 	versions      []APIVersion
+	labels        models.LabelSet
 }
 
 // NewForwarder returns a new forwarder
@@ -135,6 +136,7 @@ func NewForwarder(l log.Logger, amConfigFile string) (*Forwarder, error) {
 		logger:        l,
 		alertmanagers: alertmanagers,
 		versions:      versions,
+		labels:        alertCfg.Labels,
 	}, nil
 }
 
@@ -166,7 +168,7 @@ func (fwder *Forwarder) Forward(ctx context.Context, alerts template.Alerts) err
 					StartsAt:    strfmt.DateTime(alt.StartsAt),
 					Alert: models.Alert{
 						GeneratorURL: strfmt.URI(alt.GeneratorURL),
-						Labels:       kvToLabelSet(alt.Labels),
+						Labels:       fwder.prepareAlertLabelSet(alt.Labels),
 					},
 				})
 			}
@@ -211,6 +213,21 @@ func (fwder *Forwarder) Forward(ctx context.Context, alerts template.Alerts) err
 	}
 	level.Warn(fwder.logger).Log("msg", "failed to send alerts to all alertmanagers", "numAlerts", len(alerts))
 	return fmt.Errorf("failed to send %d alerts to all alertmanagers", len(alerts))
+}
+
+func (fwder *Forwarder) prepareAlertLabelSet(kvs template.KV) models.LabelSet {
+	ls := make(models.LabelSet, len(kvs))
+	for k, v := range kvs {
+		ls[k] = v
+	}
+
+	if fwder.labels != nil {
+		for k, v := range fwder.labels {
+			ls[k] = v
+		}
+	}
+
+	return ls
 }
 
 // kvToLabelSet translate KC to LabelSet
